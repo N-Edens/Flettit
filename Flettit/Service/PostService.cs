@@ -126,11 +126,9 @@ public class PostService
 
     public string CreatePost(string title, string content, int userId)
     {
-        // Check if the user exists
         User user = db.Users.FirstOrDefault(u => u.Id == userId);
         if (user == null)
         {
-            // User doesn't exist, handle this case
             return "User not found";
         }
 
