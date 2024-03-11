@@ -106,14 +106,14 @@ app.MapPut("/api/posts/{id}/downvote", async (PostService service, int id) =>
 
 app.MapPut("/api/posts/{postId}/comments/{commentId}/upvote", async (PostService service, int postId, int commentId) =>
 {
-    return await service.UpvoteComment(commentId);
+    return await service.UpvoteComment(commentId, postId);
 });
-
 
 app.MapPut("/api/posts/{postId}/comments/{commentId}/downvote", async (PostService service, int postId, int commentId) =>
 {
-    return await service.DownvoteComment(commentId);
+    return await service.DownvoteComment(commentId, postId);
 });
+
 
 app.Run();
 record NewPostData(string Title, string Content, int UserId);

@@ -35,10 +35,10 @@ public class PostService
             db.Posts.Add(new Post { Title = "Neymar overrated", Content = "Neymar har ikke spillet i flere år", User = user, CreationDate = currentTime });
         }
 
-        Comment comment = db.Comments.FirstOrDefault()!;
+        Comment comment = post.Comments.FirstOrDefault()!;
         if (comment == null)
         {
-            db.Comments.Add(new Comment { Content = "haha bad opnion nerd", User = user, CreationDate = currentTime });
+            post.Comments.Add(new Comment { Content = "haha bad opnion nerd", User = user, CreationDate = currentTime });
         }
 
         db.SaveChanges();
@@ -85,27 +85,45 @@ public class PostService
         return post;
     }
 
-    public async Task<Comment> UpvoteComment(int id)
+    public async Task<Comment> UpvoteComment(int commentId, int postId)
     {
-        var comment = await db.Comments.FindAsync(id);
-        if (comment != null)
+        var post = await db.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == postId);
+
+        if (post != null)
         {
-            comment.Upvotes++;
-            await db.SaveChangesAsync();
+            var comment = post.Comments.FirstOrDefault(c => c.Id == commentId);
+
+            if (comment != null)
+            {
+                comment.Upvotes++;
+                await db.SaveChangesAsync();
+                return comment;
+            }
         }
-        return comment;
+
+        return null;
     }
 
-    public async Task<Comment> DownvoteComment(int id)
+
+    public async Task<Comment> DownvoteComment(int commentId, int postId)
     {
-        var comment = await db.Comments.FindAsync(id);
-        if (comment != null)
+        var post = await db.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == postId);
+
+        if (post != null)
         {
-            comment.Downvotes++;
-            await db.SaveChangesAsync();
+            var comment = post.Comments.FirstOrDefault(c => c.Id == commentId);
+
+            if (comment != null)
+            {
+                comment.Downvotes++;
+                await db.SaveChangesAsync();
+                return comment;
+            }
         }
-        return comment;
+
+        return null;
     }
+
     public string CreatePost(string title, string content, int userId)
     {
         // Check if the user exists
@@ -126,7 +144,7 @@ public class PostService
     {
         var post = await db.Posts.FindAsync(postId);
         var comment = new Comment { Content = content, UserId = userId };
-        db.Comments.Add(comment);
+        post.Comments.Add(comment);
         await db.SaveChangesAsync();
 
         return comment;
