@@ -132,7 +132,6 @@ public class PostService
             return "User not found";
         }
 
-        // User exists, create the post
         db.Posts.Add(new Post { Title = title, Content = content, User = user });
         db.SaveChanges();
         return "Post created";
